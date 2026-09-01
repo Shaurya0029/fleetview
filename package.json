@@ -1,0 +1,26 @@
+{
+  "name": "waypoint",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/shared",
+    "packages/backend",
+    "packages/simulator",
+    "packages/dashboard"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/shared && npm run build -w packages/dashboard && npm run build -w packages/backend && npm run build -w packages/simulator && npm run copy:dashboard",
+    "copy:dashboard": "node -e \"const fs=require('fs');fs.rmSync('packages/backend/public',{recursive:true,force:true});fs.cpSync('packages/dashboard/dist','packages/backend/public',{recursive:true});\"",
+    "dev:backend": "npm run dev -w packages/backend",
+    "dev:simulator": "npm run dev -w packages/simulator",
+    "dev:dashboard": "npm run dev -w packages/dashboard",
+    "dev": "concurrently -n backend,simulator,dashboard -c blue,green,magenta \"npm:dev:backend\" \"npm:dev:simulator\" \"npm:dev:dashboard\"",
+    "start": "node packages/backend/dist/index.js",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

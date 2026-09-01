@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+packages/backend/public/
+*.log
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+.DS_Store

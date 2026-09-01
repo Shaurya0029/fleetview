@@ -1,0 +1,10 @@
+[
+  { "robot_id": "r1", "robot_type": "picker", "start": { "x": 569.9, "y": 33.0 } },
+  { "robot_id": "r2", "robot_type": "hauler", "start": { "x": 787.3, "y": 65.2 } },
+  { "robot_id": "r3", "robot_type": "picker", "start": { "x": 100.0, "y": 460.0 } },
+  { "robot_id": "r4", "robot_type": "hauler", "start": { "x": 420.0, "y": 500.0 } },
+  { "robot_id": "r5", "robot_type": "picker", "start": { "x": 300.0, "y": 40.0 } },
+  { "robot_id": "r6", "robot_type": "hauler", "start": { "x": 620.0, "y": 480.0 } },
+  { "robot_id": "r7", "robot_type": "picker", "start": { "x": 40.0, "y": 200.0 } },
+  { "robot_id": "r8", "robot_type": "hauler", "start": { "x": 870.0, "y": 300.0 } }
+]
