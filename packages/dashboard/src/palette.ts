@@ -34,3 +34,9 @@ export const STATUS_ORDER: RobotStatus[] = [
 ];
 
 export const ATTENTION_RING_COLOR = "#ffffff";
+
+export function batteryColor(pct: number): string {
+  if (pct < 15) return "#f87171";
+  if (pct < 40) return "#fbbf24";
+  return "#4ade80";
+}

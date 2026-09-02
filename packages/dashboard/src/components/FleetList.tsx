@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import type { RobotState } from "@waypoint/shared";
-import { STATUS_STYLE } from "../palette";
+import { STATUS_STYLE, batteryColor } from "../palette";
 import { useThrottledFleetSnapshot } from "../state/fleetStore";
 
 type SortKey = "robot_id" | "status" | "battery";
@@ -81,11 +81,18 @@ export function FleetList({ selectedId, onSelect }: { selectedId: string | null;
                 style={{ position: "absolute", top: idx * ROW_HEIGHT, height: ROW_HEIGHT }}
                 onClick={() => onSelect(r.robot_id)}
               >
-                <span className="fleet-row__dot" style={{ background: style.color }} />
+                <span className="fleet-row__dot" style={{ background: style.color, boxShadow: `0 0 6px ${style.color}99` }} />
                 <span className="fleet-row__id">{r.robot_id}</span>
                 <span className="fleet-row__type">{r.robot_type}</span>
-                <span className="fleet-row__status">{style.label}</span>
-                <span className="fleet-row__battery tabular">{r.battery.toFixed(0)}%</span>
+                <span
+                  className="fleet-row__status-pill"
+                  style={{ color: style.color, background: `${style.color}22`, borderColor: `${style.color}55` }}
+                >
+                  {style.label}
+                </span>
+                <span className="fleet-row__battery tabular" style={{ color: batteryColor(r.battery) }}>
+                  {r.battery.toFixed(0)}%
+                </span>
                 {r.needs_attention && <span className="fleet-row__flag" title={r.needs_attention_reasons.join(", ")}>⚠</span>}
               </div>
             );

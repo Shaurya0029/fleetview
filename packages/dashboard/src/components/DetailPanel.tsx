@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { HistoryPoint } from "@waypoint/shared";
-import { STATUS_STYLE } from "../palette";
+import { STATUS_STYLE, batteryColor } from "../palette";
 import { useThrottledFleetSnapshot } from "../state/fleetStore";
 
 function timeAgo(ms: number): string {
@@ -49,14 +49,18 @@ export function DetailPanel({ robotId, onClose }: { robotId: string; onClose: ()
         <button onClick={onClose}>×</button>
       </div>
       <div className="detail-panel__row">
-        <span className="detail-panel__status-dot" style={{ background: style.color }} />
-        {style.label}
+        <span
+          className="fleet-row__status-pill"
+          style={{ color: style.color, background: `${style.color}22`, borderColor: `${style.color}55` }}
+        >
+          {style.label}
+        </span>
         {robot.needs_attention && (
           <span className="detail-panel__attention"> — needs attention: {robot.needs_attention_reasons.join(", ")}</span>
         )}
       </div>
       <div className="detail-panel__grid tabular">
-        <div><span>Battery</span><b>{robot.battery.toFixed(1)}%</b></div>
+        <div><span>Battery</span><b style={{ color: batteryColor(robot.battery) }}>{robot.battery.toFixed(1)}%</b></div>
         <div><span>Position</span><b>{robot.x.toFixed(1)}, {robot.y.toFixed(1)}</b></div>
         <div><span>Last seen</span><b>{timeAgo(robot.last_seen)}</b></div>
         <div><span>In status for</span><b>{timeAgo(robot.status_since).replace(" ago", "")}</b></div>
