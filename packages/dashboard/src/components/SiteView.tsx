@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SITE_WIDTH, SITE_HEIGHT } from "@waypoint/shared";
 import { fleetStore } from "../state/fleetStore";
 import { STATUS_STYLE } from "../palette";
@@ -14,6 +14,17 @@ const MAX_ZOOM = 8;
 const DOT_RADIUS = 4.2;
 const SMOOTHING = 0.12; // exponential position smoothing per frame, so robots glide rather than snap to each new report
 
+// Congestion heatmap: a coarse occupancy grid over the site, accumulated in
+// real seconds-spent-per-cell (not a one-shot histogram) with an exponential
+// decay so the overlay reflects recent traffic, not the whole session's
+// history. Reuses the live positions already being rendered -- no new
+// backend surface or stored history needed.
+const HEAT_CELL = 12; // px per grid cell
+const HEAT_COLS = Math.ceil(SITE_WIDTH / HEAT_CELL);
+const HEAT_ROWS = Math.ceil(SITE_HEIGHT / HEAT_CELL);
+const HEAT_HALF_LIFE_SEC = 90;
+const HEAT_DECAY_PER_SEC = Math.log(2) / HEAT_HALF_LIFE_SEC;
+
 export function SiteView({ selectedId, onSelect }: { selectedId: string | null; onSelect: (id: string | null) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,6 +35,11 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
   const draggingRef = useRef<{ startX: number; startY: number; startPanX: number; startPanY: number; moved: boolean } | null>(
     null
   );
+  const heatGridRef = useRef<Float32Array>(new Float32Array(HEAT_COLS * HEAT_ROWS));
+  const lastFrameRef = useRef<number>(0);
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const showHeatmapRef = useRef(showHeatmap);
+  showHeatmapRef.current = showHeatmap;
 
   useEffect(() => {
     const img = new Image();
@@ -89,6 +105,15 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
 
       const now = performance.now();
       const pulse = 0.5 + 0.5 * Math.sin(now / 350);
+      const dt = lastFrameRef.current ? Math.min(0.25, (now - lastFrameRef.current) / 1000) : 0;
+      lastFrameRef.current = now;
+
+      // Pass 1: advance smoothed positions and accrue heat. Always runs
+      // (even while the overlay is hidden) so toggling it on shows real
+      // recent congestion instead of a blank grid that only just started counting.
+      const grid = heatGridRef.current;
+      const decay = Math.exp(-HEAT_DECAY_PER_SEC * dt);
+      for (let i = 0; i < grid.length; i++) grid[i] *= decay;
 
       for (const robot of fleetStore.robots.values()) {
         let rp = renderedPos.current.get(robot.robot_id);
@@ -100,6 +125,29 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
           rp.y += (robot.y - rp.y) * SMOOTHING;
         }
 
+        if (dt > 0) {
+          const gx = Math.min(HEAT_COLS - 1, Math.max(0, Math.floor(rp.x / HEAT_CELL)));
+          const gy = Math.min(HEAT_ROWS - 1, Math.max(0, Math.floor(rp.y / HEAT_CELL)));
+          grid[gy * HEAT_COLS + gx] += dt;
+        }
+      }
+
+      if (showHeatmapRef.current) {
+        for (let gy = 0; gy < HEAT_ROWS; gy++) {
+          for (let gx = 0; gx < HEAT_COLS; gx++) {
+            const v = grid[gy * HEAT_COLS + gx];
+            if (v < 0.05) continue;
+            // sqrt compression: a few very hot cells shouldn't wash out everything else
+            const alpha = Math.min(0.75, Math.sqrt(v) * 0.09);
+            ctx.fillStyle = `rgba(255, 120, 40, ${alpha})`;
+            ctx.fillRect(gx * HEAT_CELL, gy * HEAT_CELL, HEAT_CELL, HEAT_CELL);
+          }
+        }
+      }
+
+      // Pass 2: draw robots on top of the heat layer, so congestion never obscures the fleet itself.
+      for (const robot of fleetStore.robots.values()) {
+        const rp = renderedPos.current.get(robot.robot_id)!;
         const style = STATUS_STYLE[robot.status];
         const r = DOT_RADIUS / Math.sqrt(scale); // keep dots a sane on-screen size across zoom levels
 
@@ -223,9 +271,18 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
   return (
     <div className="site-view" ref={containerRef}>
       <canvas ref={canvasRef} />
-      <button className="site-view__reset" onClick={resetView} title="Reset pan/zoom">
-        Reset view
-      </button>
+      <div className="site-view__controls">
+        <button
+          className={showHeatmap ? "is-active" : ""}
+          onClick={() => setShowHeatmap((v) => !v)}
+          title="Show where robots have spent the most time recently -- a fast way to spot floor congestion"
+        >
+          Congestion
+        </button>
+        <button onClick={resetView} title="Reset pan/zoom">
+          Reset view
+        </button>
+      </div>
     </div>
   );
 }
