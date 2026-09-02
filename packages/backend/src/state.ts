@@ -149,12 +149,30 @@ export function drainDirty(): { updated: RobotState[]; removed: string[] } {
  * Server-side staleness sweep (PRD §3, §7.6): mark any robot not heard from
  * in `staleAfterMs` as offline. Also refreshes maintenance-dwell-based
  * attention between telemetry messages.
+ *
+ * `evictAfterMs` (optional, defaults to "never") additionally removes a
+ * robot from state entirely once it's been silent for that much longer.
+ * This is deliberately a separate, longer threshold from `staleAfterMs`,
+ * not a replacement for it: a robot still goes "offline" (visible, flagged)
+ * the moment it's overdue, exactly as before, and is only evicted well
+ * after that if it never comes back. That covers the fleet-size-turned-down
+ * case (see FINDINGS.md's "No separate remove robot admin action" note) —
+ * a descaled robot now eventually disappears from the dashboard by itself
+ * instead of sitting there "offline" forever — without weakening the
+ * original guarantee that a robot never vanishes the instant it goes quiet.
  */
-export function sweepStaleness(staleAfterMs: number): string[] {
+export function sweepStaleness(staleAfterMs: number, evictAfterMs = Infinity): string[] {
   const now = Date.now();
   const changed: string[] = [];
   for (const [id, r] of robots) {
     const silentFor = now - r.last_seen;
+
+    if (r.status === "offline" && silentFor > evictAfterMs) {
+      removeRobot(id);
+      changed.push(id);
+      continue;
+    }
+
     if (r.status !== "offline" && silentFor > staleAfterMs) {
       const dwellSeconds = (now - r.status_since) / 1000;
       const lastMissionContext =

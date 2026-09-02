@@ -3,6 +3,11 @@ import type { RuntimeConfig } from "@waypoint/shared";
 export const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "";
 export const PORT = Number(process.env.PORT ?? 8080);
 export const STALENESS_SWEEP_MS = Number(process.env.STALENESS_SWEEP_MS ?? 2000);
+// How long a robot must stay silent, on top of already being marked
+// offline, before it's removed from state entirely (see sweepStaleness in
+// state.ts). Kept well above STALENESS_SWEEP_MS/staleAfterMs so a robot is
+// always visibly "offline" for a while before it can ever disappear.
+export const EVICT_AFTER_MS = Number(process.env.EVICT_AFTER_MS ?? 60_000);
 export const BROADCAST_TICK_MS = Number(process.env.BROADCAST_TICK_MS ?? 350);
 export const RING_BUFFER_CAPACITY = Number(process.env.RING_BUFFER_CAPACITY ?? 720);
 
