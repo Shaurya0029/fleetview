@@ -66,25 +66,38 @@ body {
 button {
   font: inherit;
   color: var(--text);
-  background: var(--panel-3);
+  background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 5px 11px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
 }
 button:hover {
   border-color: var(--accent);
   color: var(--text);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel-3));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 3px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(108, 140, 255, 0.15);
+  transform: translateY(-1px);
 }
 button:active {
   transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) inset;
+  transition-duration: 0.03s;
 }
 button.is-active {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #0a0d13;
   border-color: transparent;
   font-weight: 600;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 3px 10px rgba(108, 140, 255, 0.35);
+}
+button.is-active:hover {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 4px 14px rgba(108, 140, 255, 0.45);
+}
+button.is-active:active {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) inset;
 }
 
 input, select {
@@ -199,7 +212,10 @@ input:focus, select:focus, button:focus-visible {
   border-radius: 50%;
 }
 .header__gear:hover {
-  transform: rotate(35deg);
+  transform: translateY(-1px) rotate(35deg);
+}
+.header__gear:active {
+  transform: translateY(1px) rotate(35deg);
 }
 
 /* Body split */
@@ -247,15 +263,6 @@ input:focus, select:focus, button:focus-visible {
 .site-view__controls button {
   font-size: 11.5px;
   font-weight: 600;
-  color: var(--text);
-  background: var(--panel-3);
-  border: 1px solid var(--border);
-}
-.site-view__controls button:hover {
-  background: var(--panel-2);
-}
-.site-view__controls button.is-active {
-  color: #0a0d13;
 }
 
 /* Fleet list */
@@ -369,12 +376,16 @@ input:focus, select:focus, button:focus-visible {
 .detail-panel__header button {
   border: none;
   background: none;
+  box-shadow: none;
   font-size: 17px;
   padding: 0 4px;
   color: var(--muted);
 }
 .detail-panel__header button:hover {
   color: var(--text);
+  background: none;
+  box-shadow: none;
+  transform: none;
 }
 .detail-panel__row {
   display: flex;
@@ -501,11 +512,15 @@ input:focus, select:focus, button:focus-visible {
 .live-controls__close {
   border: none;
   background: none;
+  box-shadow: none;
   font-size: 20px;
   color: var(--muted);
 }
 .live-controls__close:hover {
   color: var(--text);
+  background: none;
+  box-shadow: none;
+  transform: none;
 }
 .live-controls section {
   margin-top: 18px;
@@ -535,6 +550,14 @@ input:focus, select:focus, button:focus-visible {
   font-weight: 700;
   border: none;
   padding: 9px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 3px 10px rgba(108, 140, 255, 0.35);
+}
+.live-controls__submit:hover {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 4px 14px rgba(108, 140, 255, 0.45);
+}
+.live-controls__submit:active {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) inset;
 }
 .live-controls__status {
   font-size: 12px;
