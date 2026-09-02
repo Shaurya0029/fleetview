@@ -7,5 +7,7 @@ packages/backend/public/
 .env.*
 !.env.example
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 .DS_Store
