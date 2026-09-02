@@ -2,10 +2,10 @@
 
 A live fleet telemetry & operations dashboard, built for the Peppermint Robotics SDE-1 challenge.
 
-**Live dashboard:** _TODO — not yet deployed. See "Deploying" below — this needs a Render account connected to this repo's GitHub remote, which the assistant building this could not do on its own._
-**Live backend health check:** `<same URL>/healthz`
+**Live dashboard:** https://waypoint-i69h.onrender.com
+**Live backend health check:** https://waypoint-i69h.onrender.com/healthz
 
-> Submission note: the live URLs above are placeholders until this repo is pushed to GitHub and connected to Render (see **Deploying**). Everything else in this document — architecture, run steps, config knobs — is accurate as of this build.
+> Deployed on Render's free tier via the `render.yaml` blueprint. Load-tested against this exact live instance up to 4,000 simulated robots with no measurable degradation — see `FINDINGS.md`.
 
 ---
 
@@ -105,4 +105,4 @@ This project was built end-to-end in a single Claude Code session, working from 
 - **AI-drafted, as-is:** all source code — simulator (motion/battery/status-machine/networking), backend (ingest/state/stream/routes/staleness/history), dashboard (all components, state stores, styling), tests, `render.yaml`, `Dockerfile`.
 - **AI-drafted then verified by running it, not just reading it:** the whole pipeline was smoke-tested locally (backend + simulator over real WebSockets, live config resize, staleness → offline behavior) and the dashboard was driven in a real headless browser (Playwright) to check rendering, search/filter, canvas click-to-select, and the trend chart — not just unit tests. That process caught and fixed two real bugs before they'd have shipped: a CSS Grid layout bug (implicit `1fr` tracks sizing to content instead of the viewport, blowing the canvas out to ~4400px wide) and a genuine pathfinding bug (the obstacle-avoidance visibility graph was silently split into two disconnected halves at every rectangle, because a straight line between two corners of the *same* rectangle was flagged as blocked by that rectangle's own boundary — meaning robots would have routed straight through walls whenever a path needed to go around a corner). Both are described in `FINDINGS.md`.
 - **Decisions the brief left open** (active vs. on_mission, picker vs. hauler motion profiles, what counts as "needs attention", server-side offline detection): made by the planning session that produced `WAYPOINT_PRD.md`, with reasoning recorded there in §3; this build followed them as given.
-- **Not yet AI-verified:** the actual Render deployment and the load test against it (§12 phase 4–5 of the PRD) — this requires a GitHub/Render account this session doesn't have access to. See the placeholder at the top of this file.
+- **Render deployment and the load test against it** (§12 phase 4–5 of the PRD): the deployment itself was done from Shaurya's own Render account (this assistant has no such credentials). The load test — ramping `fleet_size` from 8 up to 4,000 against the live URL above via `POST /admin/config`, polling `/metrics` and `/robots` at each step — was run and verified by a Claude Code session with direct access to the live deployment. Numbers and the one real anomaly found (an under-reporting `ingest_msgs_per_sec` metric) are in `FINDINGS.md`.
