@@ -149,12 +149,19 @@ input:focus, select:focus, button:focus-visible {
 .site-view canvas {
   display: block;
 }
-.site-view__reset {
+.site-view__controls {
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  gap: 6px;
+}
+.site-view__controls button {
   font-size: 11.5px;
   opacity: 0.85;
+}
+.site-view__controls button.is-active {
+  opacity: 1;
 }
 
 /* Fleet list */
