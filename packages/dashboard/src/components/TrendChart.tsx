@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { STATUS_ORDER, STATUS_STYLE } from "../palette";
+import { STATUS_ORDER, STATUS_STYLE, STATUS_DESCRIPTION } from "../palette";
 import { trendSampler } from "../state/trendSampler";
 
 type Preset = 60 | 300 | 900;
@@ -136,12 +136,15 @@ export function TrendChart() {
   return (
     <div className="trend-chart">
       <div className="trend-chart__toolbar">
-        <span className="trend-chart__title">Fleet status composition</span>
+        <span className="trend-chart__title" title="Share of the fleet in each status over time, as a stacked area">
+          Fleet status composition
+        </span>
         <div className="trend-chart__presets">
           {PRESETS.map((p) => (
             <button
               key={p.seconds}
               className={!customRange && preset === p.seconds ? "is-active" : ""}
+              title={`Show the last ${p.label} of fleet status history`}
               onClick={() => {
                 setPreset(p.seconds);
                 setCustomRange(null);
@@ -150,11 +153,15 @@ export function TrendChart() {
               {p.label}
             </button>
           ))}
-          {customRange && <button onClick={() => setCustomRange(null)}>Reset zoom</button>}
+          {customRange && (
+            <button title="Return to the fixed 1m/5m/15m presets" onClick={() => setCustomRange(null)}>
+              Reset zoom
+            </button>
+          )}
         </div>
         <div className="trend-chart__legend">
           {STATUS_ORDER.map((s) => (
-            <span key={s} className="trend-chart__legend-item">
+            <span key={s} className="trend-chart__legend-item" title={STATUS_DESCRIPTION[s]}>
               <span className="dot" style={{ background: STATUS_STYLE[s].color }} />
               {STATUS_STYLE[s].label}
             </span>
@@ -162,7 +169,7 @@ export function TrendChart() {
         </div>
       </div>
       <div className="trend-chart__canvas-wrap" ref={containerRef}>
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRef} title="Drag to zoom into a time range" />
       </div>
     </div>
   );

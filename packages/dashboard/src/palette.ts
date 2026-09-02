@@ -22,6 +22,18 @@ export const STATUS_STYLE: Record<RobotStatus, StatusStyle> = {
   offline: { color: "#5b6472", label: "Offline", needsAttentionCapable: true },
 };
 
+// Short hover explanations, per PRD §3's decisions on what each status means.
+export const STATUS_DESCRIPTION: Record<RobotStatus, string> = {
+  idle: "Not currently moving or working.",
+  active: "Doing autonomous work not tied to a dispatched task.",
+  on_mission: "Executing a specific dispatched task.",
+  charging: "Docked and charging its battery.",
+  blocked: "Stopped by an obstacle or another robot — needs attention.",
+  error: "Reporting a fault — needs attention.",
+  maintenance: "In maintenance; flagged if stuck past its expected duration.",
+  offline: "Hasn't reported in — the backend, not the robot, declared this.",
+};
+
 export const STATUS_ORDER: RobotStatus[] = [
   "idle",
   "active",

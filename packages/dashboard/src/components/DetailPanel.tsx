@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { HistoryPoint } from "@waypoint/shared";
-import { STATUS_STYLE, batteryColor } from "../palette";
+import { STATUS_STYLE, STATUS_DESCRIPTION, batteryColor } from "../palette";
 import { useThrottledFleetSnapshot } from "../state/fleetStore";
 
 function timeAgo(ms: number): string {
@@ -51,6 +51,7 @@ export function DetailPanel({ robotId, onClose }: { robotId: string; onClose: ()
       <div className="detail-panel__row">
         <span
           className="fleet-row__status-pill"
+          title={STATUS_DESCRIPTION[robot.status]}
           style={{ color: style.color, background: `${style.color}22`, borderColor: `${style.color}55` }}
         >
           {style.label}
@@ -60,10 +61,10 @@ export function DetailPanel({ robotId, onClose }: { robotId: string; onClose: ()
         )}
       </div>
       <div className="detail-panel__grid tabular">
-        <div><span>Battery</span><b style={{ color: batteryColor(robot.battery) }}>{robot.battery.toFixed(1)}%</b></div>
-        <div><span>Position</span><b>{robot.x.toFixed(1)}, {robot.y.toFixed(1)}</b></div>
-        <div><span>Last seen</span><b>{timeAgo(robot.last_seen)}</b></div>
-        <div><span>In status for</span><b>{timeAgo(robot.status_since).replace(" ago", "")}</b></div>
+        <div title="Red under 15%, amber under 40%"><span>Battery</span><b style={{ color: batteryColor(robot.battery) }}>{robot.battery.toFixed(1)}%</b></div>
+        <div title="This robot's last reported site coordinates (pixels on layout.png)"><span>Position</span><b>{robot.x.toFixed(1)}, {robot.y.toFixed(1)}</b></div>
+        <div title="Time since the backend last received an update from this robot"><span>Last seen</span><b>{timeAgo(robot.last_seen)}</b></div>
+        <div title="How long this robot has held its current status"><span>In status for</span><b>{timeAgo(robot.status_since).replace(" ago", "")}</b></div>
       </div>
       {robot.last_mission_context && (
         <p className="muted">Last seen mid-mission at {new Date(robot.last_mission_context.at).toLocaleTimeString()}.</p>

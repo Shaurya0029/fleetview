@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import type { RobotState } from "@waypoint/shared";
-import { STATUS_STYLE, batteryColor } from "../palette";
+import { STATUS_STYLE, STATUS_DESCRIPTION, batteryColor } from "../palette";
 import { useThrottledFleetSnapshot } from "../state/fleetStore";
 
 type SortKey = "robot_id" | "status" | "battery";
@@ -48,20 +48,34 @@ export function FleetList({ selectedId, onSelect }: { selectedId: string | null;
         <input
           className="fleet-list__search"
           placeholder="Search robots…"
+          title="Filter the list below by robot ID or type (e.g. picker, hauler)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select className="fleet-list__sort" value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>
+        <select
+          className="fleet-list__sort"
+          title="Change the sort order of the fleet list"
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value as SortKey)}
+        >
           <option value="robot_id">Sort: ID</option>
           <option value="status">Sort: Status</option>
           <option value="battery">Sort: Battery</option>
         </select>
       </div>
       <div className="fleet-list__tabs">
-        <button className={attentionOnly ? "" : "is-active"} onClick={() => setAttentionOnly(false)}>
+        <button
+          className={attentionOnly ? "" : "is-active"}
+          title="Show every robot currently reporting"
+          onClick={() => setAttentionOnly(false)}
+        >
           All ({robots.length})
         </button>
-        <button className={attentionOnly ? "is-active" : ""} onClick={() => setAttentionOnly(true)}>
+        <button
+          className={attentionOnly ? "is-active" : ""}
+          title="Show only robots that are error, blocked, offline, stuck in maintenance, or critically low on battery"
+          onClick={() => setAttentionOnly(true)}
+        >
           Needs attention ({attentionCount})
         </button>
       </div>
@@ -86,11 +100,16 @@ export function FleetList({ selectedId, onSelect }: { selectedId: string | null;
                 <span className="fleet-row__type">{r.robot_type}</span>
                 <span
                   className="fleet-row__status-pill"
+                  title={STATUS_DESCRIPTION[r.status]}
                   style={{ color: style.color, background: `${style.color}22`, borderColor: `${style.color}55` }}
                 >
                   {style.label}
                 </span>
-                <span className="fleet-row__battery tabular" style={{ color: batteryColor(r.battery) }}>
+                <span
+                  className="fleet-row__battery tabular"
+                  title="Battery level — red under 15%, amber under 40%"
+                  style={{ color: batteryColor(r.battery) }}
+                >
                   {r.battery.toFixed(0)}%
                 </span>
                 {r.needs_attention && <span className="fleet-row__flag" title={r.needs_attention_reasons.join(", ")}>⚠</span>}

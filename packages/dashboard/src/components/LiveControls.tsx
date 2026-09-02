@@ -98,23 +98,27 @@ export function LiveControls({ onClose }: { onClose: () => void }) {
               {config.payload_bytes}B padding
             </p>
           )}
-          <label>
+          <label title="Bearer token required to change config — find it in Render's Environment tab for this service">
             Admin token
             <input type="password" value={token} onChange={(e) => setToken(e.target.value)} placeholder="ADMIN_TOKEN" />
           </label>
-          <label>
+          <label title="Number of simulated robots to run. Takes effect on the simulator's next config poll (a few seconds).">
             Fleet size
             <input type="number" min={0} value={fleetSize} onChange={(e) => setFleetSize(e.target.value)} />
           </label>
-          <label>
+          <label title="How often each simulated robot reports in, in milliseconds. Lower = more messages/sec.">
             Update interval (ms)
             <input type="number" min={50} value={updateInterval} onChange={(e) => setUpdateInterval(e.target.value)} />
           </label>
-          <label>
+          <label title="Pads each telemetry message to roughly this many bytes — useful for testing bandwidth under larger payloads.">
             Payload padding (bytes)
             <input type="number" min={0} value={payloadBytes} onChange={(e) => setPayloadBytes(e.target.value)} />
           </label>
-          <button className="live-controls__submit" onClick={submit}>
+          <button
+            className="live-controls__submit"
+            title="Push these values to the running backend immediately — no redeploy needed"
+            onClick={submit}
+          >
             Apply to live deployment
           </button>
           {status && <p className="live-controls__status">{status}</p>}

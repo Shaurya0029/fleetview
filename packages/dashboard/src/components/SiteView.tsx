@@ -270,7 +270,7 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
 
   return (
     <div className="site-view" ref={containerRef}>
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} title="Scroll to zoom, drag to pan, click a robot to see its details" />
       <div className="site-view__controls">
         <button
           className={showHeatmap ? "is-active" : ""}
