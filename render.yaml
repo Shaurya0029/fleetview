@@ -13,7 +13,7 @@ services:
       - key: ADMIN_TOKEN
         generateValue: true # copy this from the Render dashboard's Environment tab for the live-controls panel
       - key: FLEET_SIZE
-        value: "8"
+        value: "15"
       - key: UPDATE_INTERVAL_MS
         value: "5000"
       - key: PAYLOAD_BYTES
