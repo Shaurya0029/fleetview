@@ -77,6 +77,7 @@ All are environment variables read by the **backend** at startup, and (for fleet
 | `EMBED_SIMULATOR` | `false` | If `true`, the backend spawns the simulator as its own child process (used in production; left off for `npm run dev`, which already runs the simulator as its own workspace process) |
 | `BROADCAST_TICK_MS` | `350` | How often `/stream` gathers and sends a batched diff |
 | `STALENESS_SWEEP_MS` | `2000` | How often the backend scans for robots that have gone silent |
+| `EVICT_AFTER_MS` | `60000` | How much longer, on top of already being marked offline, a robot must stay silent before it's removed from state entirely (e.g. after `fleet_size` is turned down) — see `FINDINGS.md` |
 | `HISTORY_DB_PATH` | `./waypoint-history.db` | SQLite file for the history stretch goal (see `ARCHITECTURE.md`) |
 
 The **simulator**, when run as its own process (not embedded), reads `FLEET_SIZE` / `UPDATE_INTERVAL_MS` / `PAYLOAD_BYTES` as its own *initial* values but then polls the backend's `GET /config` every few seconds and reconciles to whatever the backend's live config says — so the backend's admin panel is always the source of truth for a running fleet, whichever way the simulator was started.
