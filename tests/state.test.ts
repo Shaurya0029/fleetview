@@ -100,6 +100,35 @@ describe("sweepStaleness", () => {
     sweepStaleness(999_999); // effectively "never times out"
     expect(getRobot("r8")?.status).toBe("idle");
   });
+
+  it("evicts a robot from state once it has been offline longer than evictAfterMs (e.g. after a fleet-size scale-down)", async () => {
+    const { upsertTelemetry, sweepStaleness, getRobot } = await freshState();
+    upsertTelemetry({ t: 0, robot_id: "r10", x: 0, y: 0, status: "idle", battery: 80, seq: 1 }, "picker");
+
+    // first sweep: goes offline, same as today — eviction is opt-in via the
+    // second argument, so a caller that only passes staleAfterMs (like the
+    // existing tests above) sees no change in behavior at all.
+    sweepStaleness(-1);
+    expect(getRobot("r10")?.status).toBe("offline");
+
+    // second sweep, now with an eviction threshold: an already-offline
+    // robot silent past evictAfterMs is removed from state entirely.
+    const changed = sweepStaleness(-1, -1);
+    expect(changed).toContain("r10");
+    expect(getRobot("r10")).toBeUndefined();
+  });
+
+  it("does not evict an offline robot before evictAfterMs has elapsed", async () => {
+    const { upsertTelemetry, sweepStaleness, getRobot } = await freshState();
+    upsertTelemetry({ t: 0, robot_id: "r11", x: 0, y: 0, status: "idle", battery: 80, seq: 1 }, "picker");
+
+    sweepStaleness(-1); // goes offline
+    expect(getRobot("r11")?.status).toBe("offline");
+
+    sweepStaleness(-1, 999_999); // eviction threshold effectively "never"
+    expect(getRobot("r11")?.status).toBe("offline");
+    expect(getRobot("r11")).toBeDefined();
+  });
 });
 
 describe("drainDirty", () => {
