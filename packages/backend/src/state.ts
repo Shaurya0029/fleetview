@@ -90,6 +90,7 @@ export function upsertTelemetry(
     needs_attention: reasons.length > 0,
     needs_attention_reasons: reasons,
     last_mission_context: lastMissionContext,
+    cargo: event.cargo,
   };
 
   robots.set(event.robot_id, next);

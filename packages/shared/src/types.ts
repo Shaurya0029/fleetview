@@ -12,6 +12,17 @@ export type RobotStatus =
 
 export type TaskEvent = "task_started" | "task_completed";
 
+/**
+ * What a robot is currently carrying, in human-readable warehouse terms.
+ * Optional and additive to the base telemetry contract (warehouse-scenario
+ * addendum) — only present while a robot is actively working a mission.
+ */
+export interface Cargo {
+  sku: string;
+  label: string;
+  quantity: number;
+}
+
 export interface RobotStart {
   x: number;
   y: number;
@@ -36,6 +47,8 @@ export interface TelemetryEvent {
   seq?: number;
   /** Padding to reach a configured PAYLOAD_BYTES target. Ignored by consumers. */
   _pad?: string;
+  /** Present only while on_mission/active; see Cargo. */
+  cargo?: Cargo;
 }
 
 /** Server-side view of a robot: telemetry plus everything the backend derives. */
@@ -59,6 +72,8 @@ export interface RobotState {
     status: RobotStatus;
     at: number;
   };
+  /** Present only while on_mission/active; see Cargo. */
+  cargo?: Cargo;
 }
 
 export interface StreamSnapshotMessage {

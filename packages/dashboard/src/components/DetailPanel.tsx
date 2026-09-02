@@ -66,6 +66,11 @@ export function DetailPanel({ robotId, onClose }: { robotId: string; onClose: ()
         <div title="Time since the backend last received an update from this robot"><span>Last seen</span><b>{timeAgo(robot.last_seen)}</b></div>
         <div title="How long this robot has held its current status"><span>In status for</span><b>{timeAgo(robot.status_since).replace(" ago", "")}</b></div>
       </div>
+      {robot.cargo && (
+        <p className="detail-panel__cargo" title="What this robot is currently carrying">
+          Currently handling: {robot.cargo.quantity}× {robot.cargo.label} ({robot.cargo.sku})
+        </p>
+      )}
       {robot.last_mission_context && (
         <p className="muted">Last seen mid-mission at {new Date(robot.last_mission_context.at).toLocaleTimeString()}.</p>
       )}

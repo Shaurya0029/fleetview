@@ -17,6 +17,8 @@ Three pieces, one deployable service (see `ARCHITECTURE.md` for the full diagram
 2. **Backend** (`packages/backend`) — Fastify server: ingests robot telemetry, holds the fleet's current state in memory, broadcasts batched diffs to dashboards, and serves the built dashboard as static files.
 3. **Dashboard** (`packages/dashboard`) — React + Canvas control-room UI: live site view, searchable/filterable fleet list, zoomable trend chart.
 
+The site map's six static zones are labeled as a generic fulfillment warehouse would be (storage by category, packing, shipping, a charging bay — see `packages/shared/src/warehouse.ts`), and a robot that's `on_mission`/`active` shows what it's currently carrying in its detail panel — illustrative, not modeled on any real company's actual facility.
+
 In production these run as **one process** on Render: the backend serves the API/WebSockets and the dashboard's static build, and spawns the simulator as a real child process talking to itself over a real WebSocket (an actual network hop, not just a function call).
 
 ---

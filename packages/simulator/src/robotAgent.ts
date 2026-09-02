@@ -1,8 +1,9 @@
 import WebSocket from "ws";
-import type { RobotRosterEntry, RobotStatus, TaskEvent, TelemetryEvent } from "@waypoint/shared";
+import type { Cargo, RobotRosterEntry, RobotStatus, TaskEvent, TelemetryEvent } from "@waypoint/shared";
 import { advanceAlongPath, findPath, pickTarget, CHARGING_DOCK, type MotionState } from "./motion.js";
 import { stepBattery } from "./battery.js";
 import { maybeTransition } from "./statusTransitions.js";
+import { isWorkingStatus, pickCargo } from "./cargo.js";
 
 const SPEED_PX_PER_SEC: Record<"picker" | "hauler", number> = {
   picker: 18,
@@ -29,6 +30,7 @@ export class RobotAgent {
   private seq = 0;
   private readonly startedAt = Date.now();
   private pendingTaskEvent: TaskEvent | undefined;
+  private cargo: Cargo | undefined;
 
   constructor(
     private readonly entry: RobotRosterEntry,
@@ -106,6 +108,12 @@ export class RobotAgent {
     if (nextStatus !== this.status) {
       if (nextStatus === "on_mission") this.pendingTaskEvent = "task_started";
       else if (this.status === "on_mission") this.pendingTaskEvent = "task_completed";
+
+      const wasWorking = isWorkingStatus(this.status);
+      const willBeWorking = isWorkingStatus(nextStatus);
+      if (willBeWorking && !wasWorking) this.cargo = pickCargo(this.entry.robot_type);
+      else if (!willBeWorking && wasWorking) this.cargo = undefined;
+
       this.status = nextStatus;
       this.statusSince = now;
       this.motion.path = []; // force a fresh target under the new status
@@ -141,6 +149,9 @@ export class RobotAgent {
     if (this.pendingTaskEvent) {
       event.task_event = this.pendingTaskEvent;
       this.pendingTaskEvent = undefined;
+    }
+    if (this.cargo) {
+      event.cargo = this.cargo;
     }
 
     const payloadBytes = this.opts.getPayloadBytes();

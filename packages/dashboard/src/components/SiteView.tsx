@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { SITE_WIDTH, SITE_HEIGHT } from "@waypoint/shared";
+import { SITE_WIDTH, SITE_HEIGHT, OBSTACLES, WAREHOUSE_ZONES } from "@waypoint/shared";
 import { fleetStore } from "../state/fleetStore";
 import { STATUS_STYLE } from "../palette";
 
@@ -101,6 +101,44 @@ export function SiteView({ selectedId, onSelect }: { selectedId: string | null; 
       } else {
         ctx.fillStyle = "#161b26";
         ctx.fillRect(0, 0, SITE_WIDTH, SITE_HEIGHT);
+      }
+
+      // Warehouse-scenario addendum: label each static zone rectangle with
+      // what part of the floor it represents. Purely decorative text over
+      // the existing image -- no effect on motion, obstacles, or state.
+      ctx.font = "600 11px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const zone of WAREHOUSE_ZONES) {
+        const rect = OBSTACLES[zone.obstacleIndex];
+        if (!rect) continue;
+        const cx = (rect.x0 + rect.x1) / 2;
+        const cy = (rect.y0 + rect.y1) / 2;
+        const rectW = rect.x1 - rect.x0;
+        const rectH = rect.y1 - rect.y0;
+        const vertical = rectH > rectW * 1.5;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (vertical) ctx.rotate(-Math.PI / 2);
+
+        const metrics = ctx.measureText(zone.name);
+        const padX = 6;
+        const padY = 3;
+        const boxW = metrics.width + padX * 2;
+        const boxH = 11 + padY * 2;
+        ctx.fillStyle = "rgba(11, 14, 20, 0.72)";
+        ctx.beginPath();
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(-boxW / 2, -boxH / 2, boxW, boxH, 4);
+        } else {
+          ctx.rect(-boxW / 2, -boxH / 2, boxW, boxH);
+        }
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(230, 235, 241, 0.92)";
+        ctx.fillText(zone.name, 0, 0.5);
+        ctx.restore();
       }
 
       const now = performance.now();
