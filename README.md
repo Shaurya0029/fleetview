@@ -1,6 +1,6 @@
 # Waypoint
 
-A live fleet telemetry & operations dashboard, built for the Peppermint Robotics SDE-1 challenge.
+A live fleet telemetry & operations dashboard for monitoring and managing a robot fleet in real time.
 
 **Live dashboard:** https://waypoint-i69h.onrender.com
 **Live backend health check:** https://waypoint-i69h.onrender.com/healthz
