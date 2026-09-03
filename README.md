@@ -4,6 +4,7 @@ A live fleet telemetry & operations dashboard for monitoring and managing a robo
 
 **Live dashboard:** https://waypoint-i69h.onrender.com
 **Live backend health check:** https://waypoint-i69h.onrender.com/healthz
+**Reviewer demo admin token:** `waypoint-demo-2026` — paste into the dashboard's gear icon → Live controls → Admin token to try changing fleet size / update interval / payload padding on the live deployment.
 
 > Deployed on Render's free tier via the `render.yaml` blueprint. Load-tested against this exact live instance up to 4,000 simulated robots with no measurable degradation — see `FINDINGS.md`.
 
